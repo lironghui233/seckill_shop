@@ -1,0 +1,10 @@
+
+
+MYSQL_HOST = '172.23.23.68'
+MYSQL_PORT = 3306
+MYSQL_USER = 'leoh123'
+MYSQL_PASSWORD = '123123123'
+MYSQL_DB = 'leoh_seckillshop_user_db'
+
+
+DB_URI = f"mysql+asyncmy://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}?charset=utf8mb4"
