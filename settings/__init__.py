@@ -8,3 +8,7 @@ MYSQL_DB = 'leoh_seckillshop_user_db'
 
 
 DB_URI = f"mysql+asyncmy://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}?charset=utf8mb4"
+
+
+DATACENTER_ID = 0
+WORKER_ID = 0
