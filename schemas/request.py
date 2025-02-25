@@ -6,3 +6,8 @@ class LoginModel(BaseModel):
 
 class UpdateUsernameModel(BaseModel):
     username: str
+
+class UpdatePasswordModel(BaseModel):
+    password: str
+
+

@@ -26,7 +26,47 @@ class UserServiceClient(metaclass=SingletonMeta):
             return reponse.user
 
     @grpc_error_handler
-    async def update_username(self, id:int, username:str):
+    async def update_username(self, user_id:int, username:str):
         async with UserStub() as stub:
-            request = user_pb2.UsernameRequest(id=id, username=username)
+            request = user_pb2.UsernameRequest(id=user_id, username=username)
             await stub.UpdateUsername(request)
+
+    @grpc_error_handler
+    async def update_password(self, user_id:int, password:str):
+        async with UserStub() as stub:
+            request = user_pb2.PasswordRequest(id=user_id, password=password)
+            await stub.UpdatePassword(request)
+
+    @grpc_error_handler
+    async def update_avatar(self, user_id:int, avatar:str):
+        async with UserStub() as stub:
+            request = user_pb2.AvatarRequest(id=user_id, avatar=avatar)
+            await stub.UpdateAvatar(request)
+
+    @grpc_error_handler
+    async def get_user_by_id(self, user_id:int):
+        async with UserStub() as stub:
+            request = user_pb2.IdRequest(id=user_id)
+            response = await stub.GetUserById(request)
+            return response.user
+
+    @grpc_error_handler
+    async def get_user_by_mobile(self, mobile: str):
+        async with UserStub() as stub:
+            request = user_pb2.MobileRequest(mobile=mobile)
+            response = await stub.GetUserByMobile(request)
+            return response.user
+
+    @grpc_error_handler
+    async def get_user_list(self, page: int=1, size: int=10):
+        async with UserStub() as stub:
+            request = user_pb2.PageRequest(page=page, size=size)
+            response = await stub.GetUserList(request)
+            return response.users
+
+    @grpc_error_handler
+    async def verify_user(self, mobile:str, password:str):
+        async with UserStub() as stub:
+            request = user_pb2.VerifyUserRequest(mobile=mobile, password=password)
+            response = await stub.VerifyUser(request)
+            return response.user

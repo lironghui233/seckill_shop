@@ -20,3 +20,6 @@ class LoginedModel(BaseModel):
     user: UserModel
     access_token: str
     refresh_token: str
+
+class UpdatedAvatarModel(BaseModel):
+    file_url: str

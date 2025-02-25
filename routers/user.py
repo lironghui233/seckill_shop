@@ -2,14 +2,14 @@ from fastapi import APIRouter, HTTPException
 import string
 import random
 from utils.alysms import AliyunSMSSender
-from schemas.response import ResultModel, LoginedModel
+from schemas.response import ResultModel, LoginedModel, UserModel, UpdatedAvatarModel
 from utils.cache import TLLRedis
-from schemas.request import LoginModel, UpdateUsernameModel
-import grpc
+from schemas.request import LoginModel, UpdateUsernameModel, UpdatePasswordModel
 from utils.auth import AuthHandler
-from fastapi import Depends
+from fastapi import Depends, UploadFile
 from services.user import UserServiceClient
-from utils.status_code import get_http_code
+from utils.alyoss import oss_upload_image
+from fastapi import status
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -82,3 +82,27 @@ async def update_username(data: UpdateUsernameModel, user_id: int = Depends(auth
     #     return ResultModel()
     await user_service_client.update_username(user_id, username)
     return ResultModel()
+
+@router.put('/update/password', response_model=ResultModel)
+async def update_password(data: UpdatePasswordModel, user_id: int = Depends(auth_handler.auth_access_dependency)):
+    password = data.password
+    await user_service_client.update_password(user_id, password)
+    return ResultModel()
+
+@router.put('/update/avatar', response_model=UpdatedAvatarModel)
+async def update_avatar(
+        file: UploadFile,
+        user_id: int = Depends(auth_handler.auth_access_dependency)
+):
+    file_url = await oss_upload_image(file)
+    if file_url:
+        # 调用远程微服务
+        await user_service_client.update_avatar(user_id, file_url)
+        return {'file_url': file_url}
+    else:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='头像上传失败！')
+
+@router.get('/mine', response_model=UserModel)
+async def get_mine_info(user_id: int = Depends(auth_handler.auth_access_dependency)):
+    user = user_service_client.get_user_by_id(user_id)
+    return user
