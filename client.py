@@ -1,5 +1,5 @@
 import grpc
-from protos import user_pb2_grpc, user_pb2
+from protos import user_pb2_grpc, user_pb2, address_pb2, address_pb2_grpc
 
 def test_create_user(stub):
     try:
@@ -72,18 +72,32 @@ def test_get_or_create_user(stub):
     response = stub.GetOrCreateUserByMobile(request)
     print(response)
 
+def test_create_address(stub):
+    request  = address_pb2.CreateAddressRequest(
+        user_id = 1893220607349227520,
+        realname = '孙悟空',
+        mobile = '1999999999',
+        region = '北京市',
+        detail = '李家'
+    )
+    response = stub.CreateAddress(request)
+    print(response.address)
+
 def main():
     with grpc.insecure_channel('localhost:50051') as channel:
-        stub = user_pb2_grpc.UserStub(channel)
-        # test_create_user(stub)
-        # test_get_user_by_id(stub)
-        # test_get_user_by_mobile(stub)
-        # test_update_avatar(stub)
-        # test_update_username(stub)
-        # test_update_password(stub)
-        # test_verify_user(stub)
-        # test_get_user_list(stub)
-        test_get_or_create_user(stub)
+        user_stub = user_pb2_grpc.UserStub(channel)
+        # test_create_user(user_stub)
+        # test_get_user_by_id(user_stub)
+        # test_get_user_by_mobile(user_stub)
+        # test_update_avatar(user_stub)
+        # test_update_username(user_stub)
+        # test_update_password(user_stub)
+        # test_verify_user(user_stub)
+        # test_get_user_list(user_stub)
+        # test_get_or_create_user(user_stub)
+
+        address_sub = address_pb2_grpc.AddressStub(channel)
+        test_create_address(address_sub)
 
 if __name__ == '__main__':
     main()

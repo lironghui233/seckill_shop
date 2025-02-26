@@ -36,3 +36,4 @@ Base = declarative_base()
 
 # 导入其他模型的python文件
 from . import user
+from . import address
