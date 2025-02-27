@@ -5,8 +5,10 @@ import grpc
 from sqlalchemy import select, update
 from google.protobuf import empty_pb2
 from utils import pwdutil
+from loguru import logger
 
-class UserService(user_pb2_grpc.UserServicer):
+
+class UserServicer(user_pb2_grpc.UserServicer):
     async def CreateUser(self, request: user_pb2.CreateUserRequest, context, session):
         mobile = request.mobile
         try:
