@@ -11,3 +11,14 @@ class UpdatePasswordModel(BaseModel):
     password: str
 
 
+class CreateAddressModel(BaseModel):
+    realname: str
+    mobile: str
+    region: str
+    detail: str
+
+class DeleteAddressModel(BaseModel):
+    id: str
+
+class UpdateAddressModel(CreateAddressModel):
+    id: str

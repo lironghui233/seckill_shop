@@ -2,10 +2,21 @@ from utils.single import SingletonMeta
 import grpc
 from services.protos import user_pb2, user_pb2_grpc
 from .decorators import grpc_error_handler
+from utils.tll_consul import TLLConsul
+from loguru import logger
+
+tll_consul = TLLConsul()
 
 class UserStub:
     def __init__(self):
-        self.user_service_addr = '127.0.0.1:50051'
+        # self.user_service_addr = '127.0.0.1:50051'
+        pass
+
+    @property
+    def user_service_addr(self):
+        host, port =  tll_consul.get_one_user_service_address()
+        # logger.info(f"Get user service address: {host}:{port}")
+        return f"{host}:{port}"
 
     async def __aenter__(self):
         self.channel = grpc.aio.insecure_channel(self.user_service_addr)
@@ -22,8 +33,8 @@ class UserServiceClient(metaclass=SingletonMeta):
     async def get_or_create_user_by_mobile(self, mobile:str):
         async with UserStub() as stub:
             request = user_pb2.MobileRequest(mobile=mobile)
-            reponse = await stub.GetOrCreateUserByMobile(request)
-            return reponse.user
+            response = await stub.GetOrCreateUserByMobile(request)
+            return response.user
 
     @grpc_error_handler
     async def update_username(self, user_id:int, username:str):
