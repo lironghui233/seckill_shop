@@ -15,50 +15,36 @@
 	</view>
 	
 	<view v-if="selectedTab==TabEnum.SECKILLING">
-		<seckill-card @tap="onSeckillCardTap(index)" v-for="(goods,index) in goods_list" :goods='goods' :key="goods.title"></seckill-card>
+		<seckill-card @tap="onSeckillCardTap(index)" v-for="(goods,index) in ing_seckills" :goods='goods' :key="goods.title"></seckill-card>
 	</view>	
 	
 	<view v-else>
-		<seckill-card :type="TabEnum.SECKILLWILL" v-for="goods in goods_list" :goods='goods' :key="goods.title"></seckill-card>
+		<seckill-card :type="TabEnum.SECKILLWILL" v-for="goods in will_seckills" :goods='goods' :key="goods.title"></seckill-card>
 	</view>
 	
 </template>
 
 <script setup>
-	import {
-		ref
-	} from "vue"
-	import {
-		TabEnum
-	} from "./types"
+	import {ref, onMounted} from "vue"
+	import {TabEnum} from "./types"
 	import seckillCard from "./components/seckill-card.vue"
+	import seckillHttp from "../../apis/seckill/seckillHttp"
 
 	let selectedTab = ref(TabEnum.SECKILLING)
-	let goods_list = ref([{
-			id: 1,
-			photo: '/static/product/ae86.jpg',
-			title: "sd第四季第七集温泉恩请问窃取欧文去我去饿我去看而且门前我n",
-			tags: ['分期付款'],
-			origin_price: 5999,
-			seckill_price: 1999,
-		},
-		{
-			id: 2,
-			photo: '/static/product/ae86.jpg',
-			title: "sdsad的撒地区青蛙大撒大撒n",
-			tags: ['分期付款'],
-			origin_price: 12312,
-			seckill_price: 123,
-		},
-		{
-			id: 3,
-			title: "sd武清区恶气热望亲热亲热去的撒v问起我n",
-			photo: '/static/product/ae86.jpg',
-			tags: ['分期付款'],
-			origin_price: 4124,
-			seckill_price: 132,
-		}
-	])
+	let ing_seckills = ref([])
+	let will_seckills = ref([])
+	
+	onMounted(async ()=>{
+		let result = await seckillHttp.getIngSeckillList()
+		let seckills = result.seckills
+		ing_seckills.value = seckills
+		
+		result = await seckillHttp.getWillSeckillList()
+		will_seckills.value = result.seckills
+		
+		console.log(ing_seckills.value);
+		console.log(will_seckills.value);
+	})
 
 	const onTabTap = (index) => {
 		selectedTab.value = index;
@@ -66,8 +52,14 @@
 	
 	const onSeckillCardTap = (index) => {
 		console.log(index);
+		let seckill = null
+		if(selectedTab.value==TabEnum.SECKILLING){
+			seckill = ing_seckills.value[index]
+		}else{
+			seckill = will_seckills.value[index]
+		}
 		uni.navigateTo({
-			url: "/pages/goods/goods"
+			url: "/pages/goods/goods?id=" + seckill.id
 		})
 	}
 </script>

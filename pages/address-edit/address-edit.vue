@@ -6,7 +6,7 @@
 		</view>
 		<view class="d-flex a-center py-2 border-bottom bg-white">
 			<text class="font-md text-dark px-2">电话</text>
-			<input v-model="formData.telephone" type="text" placeholder="请输入电话" placeholder-style="font-size: 30rpx"/>
+			<input v-model="formData.mobile" type="text" placeholder="请输入电话" placeholder-style="font-size: 30rpx"/>
 		</view>
 		<view class="d-flex a-center py-2 border-bottom bg-white">
 			<text class="font-md text-dark px-2">区域</text>
@@ -28,14 +28,18 @@
 	import mpvueCityPicker from "@/components/mpvue-citypicker/mpvueCityPicker.vue"
 	import {ref, reactive, onMounted} from "vue"
 	import useAddressStore from "@/stores/address.js"
+	import useAuthStore from "../../stores/auth"
+	import userHttp from "../../apis/user/userHttp"
 	
 	const addressStore = useAddressStore()
+	
+	let isEdit = false
 	
 	let regionPicker = ref()
 	let formData = reactive({
 		id: "",
 		realname: "",
-		telephone: "",
+		mobile: "",
 		region: "",
 		detail: ""
 	})
@@ -44,13 +48,14 @@
 		// pinia
 		const address = addressStore.address
 		if(address){
+			isEdit = true
 			uni.setNavigationBarTitle({
 				title: "编辑地址"
 			})
 			
 			formData.id = address.id
 			formData.realname = address.realname
-			formData.telephone = address.telephone
+			formData.mobile = address.mobile
 			formData.region = address.region
 			formData.detail = address.detail
 		}
@@ -61,9 +66,20 @@
 		regionPicker.value.show()
 	}	
 	
-	const onSubmit = () => {
-		// uni-app 触发事件
-		uni.$emit("address-edit", {"address": formData})
+	const onSubmit = async () => {
+		// 编辑地址
+		if (isEdit){
+			await userHttp.updateAddress(formData) 
+			// uni-app 触发事件
+			uni.$emit("address-edit", {"address": formData})
+		} 
+		// 新建地址
+		else {
+			const result = await userHttp.createAddress(formData)
+			// console.log(result);
+			// uni-app 触发事件
+			uni.$emit("address-add", {"address": result})
+		}
 		// 返回上一页
 		uni.navigateBack()
 	}
