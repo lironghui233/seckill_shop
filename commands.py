@@ -2,7 +2,7 @@ from models import AsyncSessionFactory
 from models.seckill import Commodity, Seckill
 from datetime import datetime, timedelta
 import asyncio
-# from utils.cache import tll_redis
+from utils.cache import tll_redis
 
 
 async def init_seckill_ed():
@@ -47,31 +47,31 @@ async def init_seckill_ing():
     print('ing秒杀数据添加成功！')
 
 
-# async def init_seckill_ing_redis():
-#     title = '茅台（MOUTAI）飞天 53%vol 500ml 贵州茅台酒（带杯）-Redis'
-#     covers = ['https://img13.360buyimg.com/n1/jfs/t1/97097/12/15694/245806/5e7373e6Ec4d1b0ac/9d8c13728cc2544d.jpg',
-#               'https://img13.360buyimg.com/n1/jfs/t1/249760/32/13845/169919/66835f87F26a10873/da4a057761be16f6.jpg']
-#     price = 2525
-#     detail = """
-#             <div>
-# 				<img src="https://img30.360buyimg.com/sku/jfs/t1/154199/7/27952/160501/6371ed18Eae70f83f/3a3c43b823ddfd19.jpg" alt="">
-# 				<img src="https://img30.360buyimg.com/sku/jfs/t1/102199/7/34595/124717/6371eb5bEa1ce165e/92584583e82cc994.jpg" alt="">
-# 				<img src="https://img30.360buyimg.com/sku/jfs/t1/116251/7/29193/130833/6371eb5cEe14bc797/e2cbeb2d2ece1455.jpg" alt="">
-# 			</div>
-# 			"""
-#     commodity = Commodity(title=title, covers=covers, price=price, detail=detail)
-#     seckill = Seckill(sk_price=1499, start_time=datetime.now(), end_time=datetime.now() + timedelta(days=365),
-#                       max_sk_count=10, sk_per_max_count=1, stock=10, commodity=commodity)
-#     # 1. 将秒杀数据添加到数据库中
-#     async with AsyncSessionFactory() as session:
-#         async with session.begin():
-#             session.add(commodity)
-#             session.add(seckill)
-#     # 2. 把秒杀数据也要同步到redis
-#     await tll_redis.add_seckill(seckill)
-#     await tll_redis.init_stock(seckill.id, seckill.stock)
-#
-#     print('ing秒杀数据添加成功！')
+async def init_seckill_ing_redis():
+    title = '茅台（MOUTAI）飞天 53%vol 500ml 贵州茅台酒（带杯）-Redis'
+    covers = ['https://img13.360buyimg.com/n1/jfs/t1/97097/12/15694/245806/5e7373e6Ec4d1b0ac/9d8c13728cc2544d.jpg',
+              'https://img13.360buyimg.com/n1/jfs/t1/249760/32/13845/169919/66835f87F26a10873/da4a057761be16f6.jpg']
+    price = 2525
+    detail = """
+            <div>
+				<img src="https://img30.360buyimg.com/sku/jfs/t1/154199/7/27952/160501/6371ed18Eae70f83f/3a3c43b823ddfd19.jpg" alt="">
+				<img src="https://img30.360buyimg.com/sku/jfs/t1/102199/7/34595/124717/6371eb5bEa1ce165e/92584583e82cc994.jpg" alt="">
+				<img src="https://img30.360buyimg.com/sku/jfs/t1/116251/7/29193/130833/6371eb5cEe14bc797/e2cbeb2d2ece1455.jpg" alt="">
+			</div>
+			"""
+    commodity = Commodity(title=title, covers=covers, price=price, detail=detail)
+    seckill = Seckill(sk_price=1499, start_time=datetime.now(), end_time=datetime.now() + timedelta(days=365),
+                      max_sk_count=10, sk_per_max_count=1, stock=10, commodity=commodity)
+    # 1. 将秒杀数据添加到数据库中
+    async with AsyncSessionFactory() as session:
+        async with session.begin():
+            session.add(commodity)
+            session.add(seckill)
+    # 2. 把秒杀数据也要同步到redis
+    await tll_redis.add_seckill(seckill)
+    await tll_redis.init_stock(seckill.id, seckill.stock)
+
+    print('ing秒杀数据添加成功！')
 
 
 async def init_seckill_will():
@@ -93,10 +93,10 @@ async def init_seckill_will():
 
 
 async def main():
-    await init_seckill_ed()
-    await init_seckill_ing()
-    await init_seckill_will()
-    # await init_seckill_ing_redis()
+    # await init_seckill_ed()
+    # await init_seckill_ing()
+    # await init_seckill_will()
+    await init_seckill_ing_redis()
 
 if __name__ == '__main__':
     # https://www.cnblogs.com/james-wangx/p/16111485.html

@@ -21,6 +21,9 @@ async def order_list(
 ):
     async with session.begin():
         offset = (page - 1) * size
-        result = await session.execute(select(Order).where(Order.user_id == user_id).limit(size).offset(offset))
+        result = await session.execute(
+            select(Order).where(Order.user_id == user_id)
+            .order_by(Order.create_time.desc()).limit(size).offset(offset)
+        )
         orders = result.scalars()
     return {'orders': orders}
