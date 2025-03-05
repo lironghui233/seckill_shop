@@ -24,8 +24,8 @@ async def get_sms_code(mobile: str):
     # await sms_sender.send_code(mobile, code)
     print("code", code)
     await ttl_redis.set_sms_code(mobile, code)
-    vcode = await ttl_redis.get_sms_code(mobile)
-    print("vcode", vcode)
+    # vcode = await ttl_redis.get_sms_code(mobile)
+    # print("vcode", vcode)
     return ResultModel()
 
 @router.post('/login', response_model=LoginedModel)
@@ -50,6 +50,7 @@ async def login(data: LoginModel):
     #     }
     user = await user_service_client.get_or_create_user_by_mobile(mobile)
     tokens = auth_handler.encode_login_token(user.id)
+    await ttl_redis.set_refresh_token(user.id, tokens['refresh_token'])
     return {
         'user': user,
         'access_token': tokens['access_token'],
@@ -66,6 +67,12 @@ async def refresh_token_view(user_id: int = Depends(auth_handler.auth_refresh_de
     access_token = auth_handler.encode_update_token(user_id)
     return access_token
 
+@router.post('/logout', response_model=ResultModel)
+async def logout(user_id: int = Depends(auth_handler.auth_access_dependency)):
+    await ttl_redis.delete_refresh_token(user_id)
+    return ResultModel()
+
+
 @router.put('/update/username', response_model=ResultModel)
 async def update_username(data: UpdateUsernameModel, user_id: int = Depends(auth_handler.auth_access_dependency)):
     username = data.username
@@ -81,7 +88,7 @@ async def update_username(data: UpdateUsernameModel, user_id: int = Depends(auth
     #         raise HTTPException(status_code=400, detail=e.details())
     #     return ResultModel()
     await user_service_client.update_username(user_id, username)
-    return ResultModel()
+    return ResultModel ()
 
 @router.put('/update/password', response_model=ResultModel)
 async def update_password(data: UpdatePasswordModel, user_id: int = Depends(auth_handler.auth_access_dependency)):
@@ -89,7 +96,7 @@ async def update_password(data: UpdatePasswordModel, user_id: int = Depends(auth
     await user_service_client.update_password(user_id, password)
     return ResultModel()
 
-@router.put('/update/avatar', response_model=UpdatedAvatarModel)
+@router.post('/update/avatar', response_model=UpdatedAvatarModel)
 async def update_avatar(
         file: UploadFile,
         user_id: int = Depends(auth_handler.auth_access_dependency)

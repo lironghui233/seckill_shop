@@ -1285,3 +1285,244 @@ region: "广东广州"
 detail: "weqeq"
 ]}
 
+2025-02-27 23:13:36.102 | INFO     | services.user:user_service_addr:18 - Get user service address: 192.168.0.101:57310
+2025-02-27 23:13:51.240 | INFO     | services.user:user_service_addr:18 - Get user service address: 192.168.0.101:57303
+2025-03-03 14:53:03.309 | ERROR    | hooks.middlewares:log_middleware:16 - 日志记录发生异常
+Traceback (most recent call last):
+
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\streams\memory.py", line 111, in receive
+    return self.receive_nowait()
+           │    └ <function MemoryObjectReceiveStream.receive_nowait at 0x00000256D55D5580>
+           └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\streams\memory.py", line 106, in receive_nowait
+    raise WouldBlock
+          └ <class 'anyio.WouldBlock'>
+
+anyio.WouldBlock
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\streams\memory.py", line 124, in receive
+    return receiver.item
+           └ MemoryObjectItemReceiver(task_info=AsyncIOTaskInfo(id=2572023820400, name='Task-372'), item=None)
+
+AttributeError: 'MemoryObjectItemReceiver' object has no attribute 'item'
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x00000256D55D5620>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\anyio\streams\memory.py", line 126, in receive
+    raise EndOfStream
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "D:\project\python\microservice\user_api\main.py", line 31, in <module>
+    uvicorn.run(app, host="0.0.0.0", port=settings.SERVER_PORT)
+    │       │   │                         │        └ 8000
+    │       │   │                         └ <module 'settings' from 'D:\\project\\python\\microservice\\user_api\\settings\\__init__.py'>
+    │       │   └ <fastapi.applications.FastAPI object at 0x00000256D87E8830>
+    │       └ <function run at 0x00000256D87AB2E0>
+    └ <module 'uvicorn' from 'C:\\Users\\70756\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\uvicorn\\__init__....
+
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\main.py", line 579, in run
+    server.run()
+    │      └ <function Server.run at 0x00000256D87AAAC0>
+    └ <uvicorn.server.Server object at 0x00000256D87E92B0>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ None
+           │       │   │    └ <function Server.serve at 0x00000256D87AAB60>
+           │       │   └ <uvicorn.server.Server object at 0x00000256D87E92B0>
+           │       └ <function run at 0x00000256D4864AE0>
+           └ <module 'asyncio' from 'C:\\Users\\70756\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\asyncio\\__init__.py'>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x00000256D87F6500>
+           │      └ <function Runner.run at 0x00000256D489C0E0>
+           └ <asyncio.runners.Runner object at 0x00000256D87E9550>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-p...
+           │    │     └ <function BaseEventLoop.run_until_complete at 0x00000256D4899B20>
+           │    └ <ProactorEventLoop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x00000256D87E9550>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 707, in run_until_complete
+    self.run_forever()
+    │    └ <function BaseEventLoop.run_forever at 0x00000256D4899A80>
+    └ <ProactorEventLoop running=True closed=False debug=False>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 678, in run_forever
+    self._run_once()
+    │    └ <function BaseEventLoop._run_once at 0x00000256D489B880>
+    └ <ProactorEventLoop running=True closed=False debug=False>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 2033, in _run_once
+    handle._run()
+    │      └ <function Handle._run at 0x00000256D4811260>
+    └ <Handle Task.task_wakeup()>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    │    │            │    │           │    └ <member '_args' of 'Handle' objects>
+    │    │            │    │           └ <Handle Task.task_wakeup()>
+    │    │            │    └ <member '_callback' of 'Handle' objects>
+    │    │            └ <Handle Task.task_wakeup()>
+    │    └ <member '_context' of 'Handle' objects>
+    └ <Handle Task.task_wakeup()>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x00000256D87EB380>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x00000256D8...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x0000025...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+                 │    └ <fastapi.applications.FastAPI object at 0x00000256D87E8830>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x00000256D87EB380>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x00000256D8...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x0000025...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x00000256D8...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x0000025...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x00000256D88EC830>
+          └ <fastapi.applications.FastAPI object at 0x00000256D87E8830>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x00000256D89F44A0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x0000025...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x00000256D88EC6E0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x00000256D88EC830>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 179, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x00000256D89F4AE0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x00000256D89F5770>
+                     │    └ <function log_middleware at 0x00000256D7034360>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x00000256D88EC6E0>
+
+> File "D:\project\python\microservice\user_api\hooks\middlewares.py", line 10, in log_middleware
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x00000256D89F5770>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x00000256D89F4AE0>
+
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 154, in call_next
+    raise app_exc
+          └ AttributeError("'AddressStub' object has no attribute 'address_service_addr'")
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x00000256D89F4C20>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x00000256D88EC590>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x00000256D88EC6E0>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x00000256D89F4C20>
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │                            │    │    └ <starlette.requests.Request object at 0x00000256D89F4F50>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x00000256D873B950>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x00000256D88EC590>
+          └ <function wrap_app_handling_exceptions at 0x00000256D69504A0>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x00000256D89F4900>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          └ <fastapi.routing.APIRouter object at 0x00000256D873B950>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x00000256D89F4900>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x00000256D873B950>>
+          └ <fastapi.routing.APIRouter object at 0x00000256D873B950>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x00000256D89F4900>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │     └ <function Route.handle at 0x00000256D6951C60>
+          └ APIRoute(path='/address/add', name='create_address', methods=['POST'])
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x00000256D89F4900>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │    └ <function request_response.<locals>.app at 0x00000256D88285E0>
+          └ APIRoute(path='/address/add', name='create_address', methods=['POST'])
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x00000256D89F4900>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          │                            │    └ <starlette.requests.Request object at 0x00000256D89F4D70>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x00000256D89F4680>
+          └ <function wrap_app_handling_exceptions at 0x00000256D69504A0>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x00000256D89F4B80>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x00000256D89F4A40>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.0.101', 8000),...
+          └ <function request_response.<locals>.app.<locals>.app at 0x00000256D89F4680>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x00000256D89F4D70>
+                     └ <function get_request_handler.<locals>.app at 0x00000256D8828540>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x00000256D69500E0>
+  File "C:\Users\70756\AppData\Local\Programs\Python\Python313\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+                 │         │      └ {'user_id': 1893358157330120704, 'data': CreateAddressModel(realname='罗大佑', mobile='18899990000', region='天津市南开区', detail='21...
+                 │         └ <function create_address at 0x00000256D866A520>
+                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+
+  File "D:\project\python\microservice\user_api\routers\address.py", line 20, in create_address
+    address = await address_service_client.create_address(
+                    │                      └ <function AddressServiceClient.create_address at 0x00000256D866B4C0>
+                    └ <services.address.AddressServiceClient object at 0x00000256D861AF90>
+
+  File "D:\project\python\microservice\user_api\services\decorators.py", line 11, in wrapper
+    result = await func(*args, **kwargs)
+                   │     │       └ {'user_id': 1893358157330120704, 'realname': '罗大佑', 'mobile': '18899990000', 'region': '天津市南开区', 'detail': '213是'}
+                   │     └ (<services.address.AddressServiceClient object at 0x00000256D861AF90>,)
+                   └ <function AddressServiceClient.create_address at 0x00000256D866B420>
+
+  File "D:\project\python\microservice\user_api\services\address.py", line 38, in create_address
+    async with AddressStub() as stub:
+               └ <class 'services.address.AddressStub'>
+
+  File "D:\project\python\microservice\user_api\services\address.py", line 20, in __aenter__
+    self.channel = grpc.aio.insecure_channel(self.address_service_addr)
+    │              │    │   │                └ <services.address.AddressStub object at 0x00000256D88EF0E0>
+    │              │    │   └ <function insecure_channel at 0x00000256D7AAAAC0>
+    │              │    └ <module 'grpc.aio' from 'C:\\Users\\70756\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\grpc\\aio\\__init...
+    │              └ <module 'grpc' from 'C:\\Users\\70756\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\grpc\\__init__.py'>
+    └ <services.address.AddressStub object at 0x00000256D88EF0E0>
+
+AttributeError: 'AddressStub' object has no attribute 'address_service_addr'. Did you mean: 'user_service_addr'?

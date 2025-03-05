@@ -12,7 +12,7 @@ class AddressStub:
         pass
 
     @property
-    def user_service_addr(self):
+    def address_service_addr(self):
         host, port = tll_consul.get_one_user_service_address()
         return f"{host}:{port}"
 
