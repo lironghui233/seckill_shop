@@ -1,10 +1,13 @@
 from fastapi import APIRouter, HTTPException
 import string
 import random
+
+from starlette.status import HTTP_400_BAD_REQUEST
+
 from utils.alysms import AliyunSMSSender
 from schemas.response import ResultModel, LoginedModel, UserModel, UpdatedAvatarModel
 from utils.cache import TLLRedis
-from schemas.request import LoginModel, UpdateUsernameModel, UpdatePasswordModel
+from schemas.request import LoginModel, UpdateUsernameModel, UpdatePasswordModel, LoginWithPasswordModel
 from utils.auth import AuthHandler
 from fastapi import Depends, UploadFile
 from services.user import UserServiceClient
@@ -50,6 +53,7 @@ async def login(data: LoginModel):
     #     }
     user = await user_service_client.get_or_create_user_by_mobile(mobile)
     tokens = auth_handler.encode_login_token(user.id)
+    # 存储refresh_token到缓存（refresh_token用于【单点登陆】，让用户下线的方法就是删掉用户refresh_token的缓存）
     await ttl_redis.set_refresh_token(user.id, tokens['refresh_token'])
     return {
         'user': user,
@@ -113,3 +117,22 @@ async def update_avatar(
 async def get_mine_info(user_id: int = Depends(auth_handler.auth_access_dependency)):
     user = user_service_client.get_user_by_id(user_id)
     return user
+
+@router.post('/login/with/pwd', response_model=LoginedModel)
+async def login_with_pwd(data: LoginWithPasswordModel):
+    mobile = data.mobile
+    password = data.password
+    print(mobile, password)
+    user = await user_service_client.verify_user(mobile, password)
+    if user:
+        tokens = auth_handler.encode_login_token(user.id)
+        # 存储refresh_token到缓存（refresh_token用于【单点登陆】，让用户下线的方法就是删掉用户refresh_token的缓存）
+        await ttl_redis.set_refresh_token(user.id, tokens['refresh_token'])
+        return {
+            'user': user,
+            'access_token': tokens['access_token'],
+            'refresh_token': tokens['refresh_token'],
+        }
+    else:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail='手机号或密码错误！')
+

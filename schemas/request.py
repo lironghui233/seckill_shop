@@ -22,3 +22,7 @@ class DeleteAddressModel(BaseModel):
 
 class UpdateAddressModel(CreateAddressModel):
     id: str
+
+class LoginWithPasswordModel(BaseModel):
+    mobile: str
+    password: str
