@@ -5,8 +5,12 @@ import asyncio
 from utils.cache import tll_redis
 from loguru import logger
 from models import AsyncSessionFactory
-from models.order import Order
+from models.order import Order, OrderStatusEnum
 from utils.tllalipay import tll_alipay
+from datetime import datetime, timedelta
+from sqlalchemy import select
+from kafka import KafkaProducer
+
 
 async def seckill_queue_handle():
     consumer = KafkaConsumer(
@@ -52,8 +56,6 @@ async def seckill_queue_handle():
         # 缓存订单到redis
         await tll_redis.add_order(order, alipay_order['alipay_order'])
 
-
-        
 
 async def main():
     await seckill_queue_handle()

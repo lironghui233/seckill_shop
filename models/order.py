@@ -19,7 +19,7 @@ class OrderStatusEnum(enum.Enum):
     FINISHED = 4
     # 退款中
     REFUNDING = 5
-    # 已退款
+    # 已退款/已过期
     REFUNDED = 6
 
 
