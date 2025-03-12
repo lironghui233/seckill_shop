@@ -1,0 +1,69 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+service User{
+  rpc CreateUser(CreateUserRequest) returns (UserInfoResponse);
+  rpc GetUserById(IdRequest) returns (UserInfoResponse);
+  rpc GetUserByMobile(MobileRequest) returns (UserInfoResponse);
+  rpc UpdateAvatar(AvatarRequest) returns (google.protobuf.Empty);
+  rpc UpdateUsername (UsernameRequest) returns (google.protobuf.Empty);
+  rpc UpdatePassword(PasswordRequest) returns (google.protobuf.Empty);
+  rpc GetUserList(PageRequest) returns (UserListResponse);
+  rpc VerifyUser(VerifyUserRequest) returns (UserInfoResponse);
+  rpc GetOrCreateUserByMobile(MobileRequest) returns (UserInfoResponse);
+}
+
+message CreateUserRequest {
+  string mobile = 1;
+}
+
+message IdRequest {
+  uint64 id = 1;
+}
+
+message MobileRequest {
+  string mobile = 1;
+}
+
+message AvatarRequest {
+  uint64 id = 1;
+  string avatar = 2;
+}
+
+message UsernameRequest {
+  uint64 id = 1;
+  string username = 2;
+}
+
+message PasswordRequest {
+  uint64 id = 1;
+  string password = 2;
+}
+
+message PageRequest {
+  uint32 page = 1;
+  uint32 size = 2;
+}
+
+message VerifyUserRequest {
+  string mobile = 1;
+  string password = 2;
+}
+
+message UserInfo {
+  uint64 id = 1;
+  string mobile = 2;
+  string username = 3;
+  string avatar = 4;
+  bool is_active = 5;
+  bool is_staff = 6;
+  string last_login = 7;
+}
+
+message UserInfoResponse {
+  UserInfo user = 1;
+}
+
+message UserListResponse {
+  repeated UserInfo users = 1;
+}
