@@ -9,6 +9,7 @@ import consul
 from typing import Tuple
 import socket
 from loguru import logger
+import settings
 
 def get_ip_port() -> Tuple[str, int]:
     sock_ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -22,7 +23,7 @@ def get_ip_port() -> Tuple[str, int]:
     sock_port.close()
     return ip, port
 
-client = consul.Consul(host='127.0.0.1', port=8500)
+client = consul.Consul(host=settings.CONSUL_HOST, port=settings.CONSUL_PORT)
 def register_consul(ip : str, port: int):
     service_id = uuid.uuid4().hex
     client.agent.service.register(

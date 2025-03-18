@@ -88,7 +88,7 @@ DATABASES = {
         'NAME': 'leoh_seckillshop_seckill_db',
         'USER': 'leoh123',
         'PASSWORD': '123123123',
-        'HOST': '172.23.23.68',
+        'HOST': '192.168.0.111',
         'PORT': '3306',
     }
 }
@@ -98,7 +98,7 @@ CACHES = {
     # 默认存储方式： [prefix:version:key]:[value]
     'default': {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://172.23.23.68:6379/0",
+        "LOCATION": "redis://192.168.0.111:6379/0",
         "KEY_FUNCTION":"utils.redis_key_func.make_key", # 设置去掉默认key的存储方式
     }
 }

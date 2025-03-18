@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from loguru import logger
 from typing import Optional, Callable, Any
+import settings
 
 
 class TLLRedis(metaclass=SingletonMeta):
@@ -16,7 +17,7 @@ class TLLRedis(metaclass=SingletonMeta):
     SECKILL_STOCK_LOCK_KEY = "seckill_stock_lock_{}"
 
     def __init__(self, *args, **kwargs):
-        self.client = redis.Redis(host='172.23.23.68', port=6379, db=0)
+        self.client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
         self.key_func: Optional[Callable] = kwargs.pop('key_func', None)
 
         self.prepare_key_prefix = "prepare_increase_stock:"

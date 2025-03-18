@@ -8,7 +8,7 @@ class TLLRedis(metaclass=SingletonMeta):
     REFRESH_TOKEN_PREFIX = "refresh_token_{}"
 
     def __init__(self):
-        self.client = redis.Redis(host='172.23.23.68', port=6379, db=0)
+        self.client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
 
     async def set(self, key, value, ex=5*60*60):
         await self.client.set(key, value, ex)

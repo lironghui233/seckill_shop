@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from hooks.middlewares import db_session_middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from routers import seckill, order
+import settings
+import uvicorn
 
 app = FastAPI()
 
@@ -21,3 +23,7 @@ async def root():
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=settings.SERVER_PORT)

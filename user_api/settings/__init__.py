@@ -9,8 +9,11 @@ ALIYUN_OSS_BUCKET = 'leoh-seckill-shop'
 ALIYUN_OSS_REGION = 'cn-hangzhou'
 ALIYUN_OSS_DOMAIN = 'https://leoh-seckill-shop.oss-cn-hangzhou.aliyuncs.com/'
 
-CONSUL_HOST = '127.0.0.1'
+CONSUL_HOST = '192.168.0.111'
 CONSUL_HTTP_PORT = 8500
 CONSUL_DNS_PORT = 8600
 
 SERVER_PORT = 8000
+
+REDIS_HOST = '192.168.0.111'
+REDIS_PORT = 6379
