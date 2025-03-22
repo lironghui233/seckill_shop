@@ -4,7 +4,8 @@ import useAuthStore from "../../stores/auth"
 
 class BaseUserHttp{
 	constructor() {
-	    this.base_url = "http://192.168.0.101:8000"
+		// this.base_url = "http://192.168.0.110:8000" // 访问本地
+		this.base_url = "http://192.168.0.110:80/user_api" //访问 docker swarm nginx入口
 	}
 	
 	_build_full_url(path){

@@ -5,7 +5,8 @@ import userHttp from "../user/userHttp"
 
 class BaseSeckillHttp{
 	constructor() {
-	    this.base_url = "http://192.168.0.101:8100"
+		// this.base_url = "http://192.168.0.110:8100" // 访问本地
+		this.base_url = "http://192.168.0.110:80/seckill_api" //访问 docker swarm nginx入口
 	}
 	
 	_build_full_url(path){
