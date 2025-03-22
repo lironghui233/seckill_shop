@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  user-service:
+    image: user_service:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      resources:
+        limits:
+          cpus: '0.3'
+        reservations:
+          cpus: '0.01'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - consul
+    environment:
+      - CONSUL_HOST=test_consul 
+      - CONSUL_MAX_RETRIES=500  
+      - CONSUL_RETRY_DELAY=5  
+  consul:
+    image: consul:1.8.7
+    command: >
+      sh -c "
+        mkdir -p /consul/data &&
+        chown consul:consul /consul/data &&
+        export CONTAINER_IP=$$(hostname -i) &&
+        consul agent -server -bootstrap-expect=1 -ui -client=0.0.0.0 -bind=$$CONTAINER_IP -advertise=$$CONTAINER_IP -data-dir=/consul/data
+      "
+    ports:
+      - "8500:8500"  # Consul Web UI
+      - "8600:8600/udp"  # DNS
+    deploy:
+      mode: replicated
+      placement:
+        constraints: [node.role == manager]  # 确保 Consul 运行在管理节点上
+  user-api:
+    image: user_api:0.2
+    ports:
+      - "8000:8000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      resources:
+        limits:
+          cpus: '0.3'
+        reservations:
+          cpus: '0.01'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - consul
+      - user-service
+    environment:
+      - CONSUL_HOST=test_consul 
+      - CONSUL_MAX_RETRIES=500  
+      - CONSUL_RETRY_DELAY=5  
+networks:
+  my_overlay_net:
+    driver: overlay
+    attachable: true

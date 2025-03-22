@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http.response import JsonResponse
 from rest_framework import status
 from django.contrib.auth.models import AnonymousUser
+from django.shortcuts import reverse
 
 
 # 检查是否已经登录的中间件
@@ -15,7 +16,7 @@ class LoginCheckMiddleware(MiddlewareMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 对于那些不需要登录就能访问的接口，可以写在这里
-        self.white_list = []
+        self.white_list = [reverse("health")]
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         # 说明：

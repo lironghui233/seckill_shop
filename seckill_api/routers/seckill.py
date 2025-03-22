@@ -18,6 +18,8 @@ import settings
 
 from kafka import KafkaProducer
 import json
+import asyncio
+from loguru import logger
 
 from utils.cache import tll_redis
 
@@ -47,15 +49,34 @@ alipay = AliPay(
     config=AliPayConfig(timeout=60)  # 可选，请求超时时间
 )
 
-kafka_producer = KafkaProducer(
-    bootstrap_servers=settings.KAFKA_SERVER,
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
-
 auth_handler = AuthHandler()
 
 
 router = APIRouter(prefix="/seckill", tags=["seckill"])
+
+async def init_kafka_producer():
+    global kafka_producer
+    for attempt in range(settings.KAFKA_MAX_RETRIES):
+        try:
+            kafka_producer = KafkaProducer(
+                bootstrap_servers=settings.KAFKA_SERVER,
+                value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            )
+            logger.info("Kafka service connect succeeded.")
+            break
+        except Exception as e:
+            logger.error(f"Kafka service connect failed (attempt {attempt + 1}/{settings.KAFKA_MAX_RETRIES}): {e}")
+            await asyncio.sleep(settings.KAFKA_RETRY_DELAY)
+    if not kafka_producer:
+        logger.info("kafka_producer init error.")
+
+
+@router.on_event("startup")
+async def startup_event():
+    await init_kafka_producer()
+
+
+
 
 # @router.get("/ing", response_model=SeckillListSchema)
 # async def get_ing_seckills(request:Request, page: int=1, size: int=10):
@@ -201,6 +222,10 @@ async def buy(
         session:AsyncSession=Depends(get_db_session),
         user_id: int = Depends(auth_handler.auth_access_dependency)
 ):
+    # 检查 kafka 生产者是否初始化成功
+    if not kafka_producer:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail='Kafka producer is not initialized.')
+    
     # 1. 先判断是否存在未支付或已支付的订单
     order = await tll_redis.get_order(user_id, data.seckill_id)
     if order:

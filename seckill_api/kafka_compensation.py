@@ -9,12 +9,24 @@ from models.order import Order, OrderStatusEnum
 from datetime import datetime, timedelta
 from sqlalchemy import select
 from kafka import KafkaProducer
+import time
 
-kafka_producer = KafkaProducer(
-    bootstrap_servers=settings.KAFKA_SERVER,
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
 
+kafka_producer = None
+for attempt in range(settings.KAFKA_MAX_RETRIES):
+    try:
+        kafka_producer = KafkaProducer(
+            bootstrap_servers=settings.KAFKA_SERVER,
+            value_serializer=lambda v: json.dumps(v).encode('utf-8')
+        )
+        logger.info("Kafka compensation service connect succeeded.")
+        break
+    except Exception as e:
+        logger.error(f"Kafka compensation service connect failed (attempt {attempt+1}/{settings.KAFKA_MAX_RETRIES}): {e}")
+        time.sleep(settings.KAFKA_RETRY_DELAY)
+
+if not kafka_producer:
+    logger.info("kafka_producer compensation init error.")
 
 """
 管理整个分布式事务的状态
@@ -94,7 +106,7 @@ class CompensationService:
             await tll_redis.delete(f"compensation_retries:{order_id}")
 
     async def scan_expired_orders(self):
-        print('开始扫描 过期订单')
+        logger.info('kafka_compensation 开始扫描 过期订单')
         """扫描超时未支付订单"""
         async with AsyncSessionFactory() as session:
             # 查询超时订单
@@ -211,12 +223,26 @@ class DLQProcessor:
 
     async def start_dlq_consumer(self):
         """启动死信队列消费者"""
-        consumer = KafkaConsumer(
-            self.dlq_topic,
-            bootstrap_servers=[settings.KAFKA_SERVER],
-            value_deserializer=lambda m: json.loads(m.decode('utf-8'))
-        )
-        print(f'[DLQ] 开始监听死信队列 {self.dlq_topic}')
+
+        consumer = None
+        for attempt in range(settings.KAFKA_MAX_RETRIES):
+            try:
+                consumer = KafkaConsumer(
+                    self.dlq_topic,
+                    bootstrap_servers=[settings.KAFKA_SERVER],
+                    value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+                )
+                logger.info("Kafka compensation consumer connect succeeded.")
+                break
+            except Exception as e:
+                logger.error(f"Kafka compensation consumer connect failed (attempt {attempt+1}/{settings.KAFKA_MAX_RETRIES}): {e}")
+                await asyncio.sleep(settings.KAFKA_RETRY_DELAY)
+
+        logger.info(f'[DLQ] kafka_compensation 开始监听死信队列 {self.dlq_topic}')
+
+        if not consumer:
+            logger.info("[error] kafka compensation consumer is None.")
+
         while True:
             # 使用 poll 方法，设置超时时间为 1 秒
             messages = consumer.poll(timeout_ms=1000)

@@ -19,6 +19,9 @@ app.add_middleware(BaseHTTPMiddleware, dispatch=db_session_middleware)
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/health")
+async def health():
+    return {"status": "OK"}
 
 @app.get("/hello/{name}")
 async def say_hello(name: str):

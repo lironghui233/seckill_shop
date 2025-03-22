@@ -13,13 +13,26 @@ from kafka import KafkaProducer
 
 
 async def seckill_queue_handle():
-    consumer = KafkaConsumer(
-        'seckill',
-        auto_offset_reset='latest',
-        bootstrap_servers=[settings.KAFKA_SERVER],
-        value_deserializer=lambda m: json.loads(m.decode('utf-8'))
-    )
-    print('正在监听中')
+    
+    consumer = None
+    for attempt in range(settings.KAFKA_MAX_RETRIES):
+        try:
+            consumer = KafkaConsumer(
+                'seckill',
+                auto_offset_reset='latest',
+                bootstrap_servers=[settings.KAFKA_SERVER],
+                value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+            )
+            logger.info("Kafka consumer connect succeeded.")
+            break
+        except Exception as e:
+            logger.error(f"Kafka consumer connect failed (attempt {attempt+1}/{settings.KAFKA_MAX_RETRIES}): {e}")
+            await asyncio.sleep(settings.KAFKA_RETRY_DELAY)
+
+    if not consumer:
+        logger.info("[error] kafka consumer is None.")
+
+    logger.info('kafka_consumer 正在监听中')
     for message in consumer:
         seckill_dict = message.value
         seckill_id = seckill_dict['seckill_id']

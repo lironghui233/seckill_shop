@@ -1,0 +1,201 @@
+version: "3.8"
+services:
+  seckill-api:
+    image: seckill_api:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - kafka
+    entrypoint: "python main.py"
+    environment:
+      - KAFKA_SERVER=test_kafka 
+      - KAFKA_MAX_RETRIES=500  
+      - KAFKA_RETRY_DELAY=5  
+  kafka-compensation:
+    image: seckill_api:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - kafka
+    entrypoint: "python kafka_compensation.py"
+    environment:
+      - KAFKA_SERVER=test_kafka 
+      - KAFKA_MAX_RETRIES=500  
+      - KAFKA_RETRY_DELAY=5  
+  kafka-consumer:
+    image: seckill_api:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - kafka
+    entrypoint: "python kafka_consumer.py"
+    environment:
+      - KAFKA_SERVER=test_kafka 
+      - KAFKA_MAX_RETRIES=500  
+      - KAFKA_RETRY_DELAY=5  
+  kafka:
+    image: bitnami/kafka:3.9.0-debian-12-r12
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+    ports:
+      - "9092:9092"
+      - "9093:9093" 
+  user-service:
+    image: user_service:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - consul
+    environment:
+      - CONSUL_HOST=test_consul 
+      - CONSUL_MAX_RETRIES=500  
+      - CONSUL_RETRY_DELAY=5  
+  consul:
+    image: consul:1.8.7
+    command: >
+      sh -c "
+        mkdir -p /consul/data &&
+        chown consul:consul /consul/data &&
+        export CONTAINER_IP=$$(hostname -i) &&
+        consul agent -server -bootstrap-expect=1 -ui -client=0.0.0.0 -bind=$$CONTAINER_IP -advertise=$$CONTAINER_IP -data-dir=/consul/data
+      "
+    ports:
+      - "8500:8500"  # Consul Web UI
+      - "8600:8600/udp"  # DNS
+    deploy:
+      mode: replicated
+      placement:
+        constraints: [node.role == manager]  # 确保 Consul 运行在管理节点上
+  user-api:
+    image: user_api:0.2
+    ports:
+      - "8000:8000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - consul
+      - user-service
+    environment:
+      - CONSUL_HOST=test_consul 
+      - CONSUL_MAX_RETRIES=500  
+      - CONSUL_RETRY_DELAY=5  
+  admin-back:
+    image: admin_back:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+  admin-front:
+    image: admin_front:0.3
+    ports:
+      - "80:80"  # 映射宿主机 80 端口到容器
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #   reservations:
+      #     cpus: '0.1'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    depends_on:
+      - admin-back
+      - user-api
+      - seckill-api
+    environment:
+      - USER_API_SERVICE=test_user-api:8000/health
+      - SECKILL_API_SERVICE=test_seckill-api:8100/health
+      - ADMIN_BACK_SERVICE=test_admin-back:9000/health
+networks:
+  my_overlay_net:
+    driver: overlay
+    attachable: true

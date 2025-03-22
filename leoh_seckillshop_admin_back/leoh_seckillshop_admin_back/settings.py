@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-s7t$j(wwd4sx(5k=u8zfs-jpfda^whwrzr)!!dl@%cxib^4epr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -45,6 +46,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # 'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware', #跨域
+    'leoh_seckillshop_admin_back.middleware.FixUnderscoreHostMiddleware',  # 去掉请求头Host中的下划线
     'django.middleware.common.CommonMiddleware',
     'apps.tllauth.middlewares.LoginCheckMiddleware', # 自己的用户验证中间件
     # 'django.middleware.csrf.CsrfViewMiddleware',

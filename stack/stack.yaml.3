@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  admin-back:
+    image: admin_back:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      resources:
+        limits:
+          cpus: '0.3'
+        reservations:
+          cpus: '0.01'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+  admin-front:
+    image: admin_front:0.2
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      resources:
+        limits:
+          cpus: '0.3'
+        reservations:
+          cpus: '0.01'
+      update_config:
+        parallelism: 2
+        order: start-first
+      rollback_config:
+        parallelism: 2
+        order: start-first
+    environment:
+      - USER_API_SERVICE=test_user-api:8000/health
+      - SECKILL_API_SERVICE=test_seckill-api:8100/health
+      - ADMIN_BACK_SERVICE=test_admin-back:9000/health
+networks:
+  my_overlay_net:
+    driver: overlay
+    attachable: true

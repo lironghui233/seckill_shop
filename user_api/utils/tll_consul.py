@@ -59,10 +59,12 @@ class TLLConsul(metaclass=SingletonMeta):
         self.client.agent.service.register(
             name="user_api",
             service_id=self.user_service_id,
-            address=ip,
+            # address=ip,  # 使用本机固定ip
+            address=settings.SERVER_NAME, #使用docker swarm服务的 DNS 名称
             port=port,
             tags=["user", "http"],
-            check=consul.Check.http(url=f"http://{ip}:{port}/health", interval='10s'),
+            # check=consul.Check.http(url=f"http://{ip}:{port}/health", interval='10s'),   # 使用本机固定ip
+            check=consul.Check.http(url=f"http://{settings.SERVER_NAME}:{port}/health", interval='10s'),   #使用docker swarm服务的 DNS 名称
         )
 
     def deregister(self):
@@ -70,17 +72,20 @@ class TLLConsul(metaclass=SingletonMeta):
 
     async def fetch_user_service_addresses(self):
         resolver = asyncresolver.Resolver()
-        resolver.nameservers = [self.consul_host]
+        # resolver.nameservers = [self.consul_host]
+        consul_host_ip = socket.gethostbyname(self.consul_host)
+        print("!!!!consul_host_ip!!!!!!:", consul_host_ip)
+        resolver.nameservers = [consul_host_ip]
         resolver.port = self.consul_dns_port
 
         # 解析 user_service 服务的所有ip地址
-        answer = await resolver.resolve(f'user_service.service.consul', rdatatype.A)
+        answer = await resolver.resolve(f'user-service.service.consul', rdatatype.A)
         ips = []
         for info in answer:
             ips.append(info.address)
 
         # 解析 user_service 服务的所有port地址
-        answer_port = await resolver.resolve(f'user_service.service.consul', rdatatype.SRV)
+        answer_port = await resolver.resolve(f'user-service.service.consul', rdatatype.SRV)
         ports = []
         for info in answer_port:
             ports.append(info.port)
