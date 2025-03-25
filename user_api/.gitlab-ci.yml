@@ -1,0 +1,75 @@
+variables:
+  DEPLOY_ENV: ''
+  DEPLOY_IMG: ''
+  REPO: 'user_api'
+  SERVICE_NAME: 'test_user-api'
+  CONF_NAME: ''
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev" && $CI_PIPELINE_SOURCE == "push"
+      variables:
+        DEPLOY_ENV: 'dev'
+        DEPLOY_IMG: "${REPO}:${CI_COMMIT_SHORT_SHA}"
+        CONF_NAME: "${SERVICE_NAME}-conf-${CI_COMMIT_SHORT_SHA}"
+    - if: $CI_COMMIT_TAG
+      variables:
+        DEPLOY_ENV: 'prod'
+        DEPLOY_IMG: "${REPO}:${CI_COMMIT_TAG}"
+        CONF_NAME: "${SERVICE_NAME}-conf-${CI_COMMIT_TAG}"
+    - when: always
+      variables:
+        DEPLOY_ENV: 'default'
+        DEPLOY_IMG: "${REPO}:default-${CI_COMMIT_SHORT_SHA}"
+        CONF_NAME: "${SERVICE_NAME}-conf-default-${CI_COMMIT_SHORT_SHA}"
+
+stages:
+  # 编译阶段
+  - build
+  # 部署阶段（部署到测试环境/部署到生产环境）
+  - deploy
+
+build-job:
+  stage: build
+  tags:
+    - builder
+  before_script:
+    # - docker login -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PWD} ${DOCKER_REGISTRY}
+  script:
+    # - docker build -t ${DOCKER_REGISTRY}/${DEPLOY_IMG} .
+    # - docker push ${DOCKER_REGISTRY}/${DEPLOY_IMG}
+    - docker build -t ${DEPLOY_IMG} .
+
+deploy-dev-job:
+  only:
+    variables:
+      - $DEPLOY_ENV == "dev"
+  stage: deploy
+  tags:
+    - deployer
+  variables:
+    CONF_RM_STR: ""
+  before_script:
+    # - docker login -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PWD} ${DOCKER_REGISTRY}
+  script:
+    # - docker config create --label env=dev ${CONF_NAME} dev.config.yaml
+    # - CONF_RM_STR=$(docker service inspect --format "{{range .Spec.TaskTemplate.ContainerSpec.Configs}}--config-rm {{.ConfigName}} {{end}}" ${SERVICE_NAME})
+    # - docker service update ${SERVICE_NAME} --image ${DOCKER_REGISTRY}/${DEPLOY_IMG} ${CONF_RM_STR}  --config-add src=${CONF_NAME},target=/app/config.yaml
+    - docker service update ${SERVICE_NAME} --image ${DEPLOY_IMG} 
+
+deploy-prod-job:
+  only:
+    variables:
+      - $DEPLOY_ENV == "prod"
+  stage: deploy
+  tags:
+    - deployer
+  variables:
+    CONF_RM_STR: ""
+  before_script:
+    # - docker login -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PWD} ${DOCKER_REGISTRY}
+  script:
+    # - docker config create --label env=prod ${CONF_NAME} prod.config.yaml
+    # - CONF_RM_STR=$(docker service inspect --format "{{range .Spec.TaskTemplate.ContainerSpec.Configs}}--config-rm {{.ConfigName}} {{end}}" ${SERVICE_NAME})
+    # - docker service update ${SERVICE_NAME} --image ${DOCKER_REGISTRY}/${DEPLOY_IMG} ${CONF_RM_STR}  --config-add src=${CONF_NAME},target=/app/config.yaml
+    - docker service update ${SERVICE_NAME} --image ${DEPLOY_IMG} 
